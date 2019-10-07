@@ -7,7 +7,6 @@ module.exports = {
     filename: 'inpage.js',
     path: path.resolve(__dirname, 'dist/'),
   },
-  devtool: 'source-map',
   resolve: {
     extensions: ['.ts'],
     modules: [
