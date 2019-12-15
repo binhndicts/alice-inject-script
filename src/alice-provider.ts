@@ -13,7 +13,7 @@ export class AliceProvider {
    * @param {Object} payload
    * @param {Function} callback triggered on end with (err, result)
    */
-  public send = (payload, callback) => {
+  public send(payload, callback) {
     this.sendAsync(payload, callback);
   }
 
@@ -24,7 +24,7 @@ export class AliceProvider {
    * @param {Object} payload
    * @param {Function} callback triggered on end with (err, result)
    */
-  public sendAsync = (payload, callback) => {
+  public sendAsync(payload, callback) {
     let data = {
       payload: payload,
       doOrigin : true
@@ -40,7 +40,7 @@ export class AliceProvider {
    * @method subscribeSendAsync
    * @param {Function} subscrive function
    */
-  public subscribeSendAsync = (func: (data, callback) => void ) => {
+  public subscribeSendAsync(func: (data, callback) => void ) {
     this._emitter.on('onSendAsync', func);
   }
 
@@ -50,11 +50,11 @@ export class AliceProvider {
    * @method subscribeSendAsync
    * @param {Function} subscrive function
    */
-  public subscribeSend = (func: (data, callback) => void ) => {
+  public subscribeSend(func: (data, callback) => void ) {
     this._emitter.on('onSend', func);
   }
 
-  public enable = async () => {
+  public async enable() {
     try {
       const accounts = await this.getAccounts();
       return accounts;
@@ -64,7 +64,7 @@ export class AliceProvider {
     }
   }
 
-  private getAccounts = async() => {
+  private async getAccounts() {
     return new Promise<string[]>( (resolve, reject) => {
       const payload = {
         method: 'eth_accounts'
