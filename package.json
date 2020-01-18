@@ -24,6 +24,7 @@
     "utf8": "^3.0.0",
     "webpack": "^4.40.2",
     "webpack-cli": "^3.3.9",
-    "xhr2-cookies": "^1.1.0"
+    "xhr2-cookies": "^1.1.0",
+    "web3-02": "git+ssh://git@github.com:gulabs/web3-02.git"
   }
 }
