@@ -21,7 +21,8 @@ export class MessageBridgeForRN extends MessageBridgeBase {
 
   public init() {
     this.setupCallbacks();
-  }
+    console.log('Alice : setupCallbacks');
+   }
 
   public injectWeb3Object() {
     const provider = new AliceProvider();
@@ -31,10 +32,13 @@ export class MessageBridgeForRN extends MessageBridgeBase {
     });
 
     window.web3 = new Web3(provider);
+    console.log('Alice : web3 injected');
   }
 
   public injectEtheremObject() {
     window.ethereum = this._provider;
+
+    console.log('Alice : window.ethereum injected');
   }
 
   private postMessage(data, callback) {
