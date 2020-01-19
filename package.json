@@ -1,7 +1,7 @@
 {
   "name": "alice-inject-script",
   "version": "0.9.1",
-  "main": "build/app.js",
+  "main": "build/index.js",
   "private": true,
   "scripts": {
     "build": "npx tsc",
