@@ -1,9 +1,10 @@
 {
   "name": "alice-inject-script",
   "version": "0.9.1",
+  "main": "build/app.js",
   "private": true,
   "scripts": {
-    "build": "npx webpack",
+    "build": "npx tsc",
     "build:production": "npx webpack --config webpack.config.production.js",
     "test": "jest",
     "lint": "eslint ."
@@ -19,12 +20,12 @@
     "post-message-stream": "^3.0.0",
     "ts-loader": "^6.1.0",
     "tslint": "^5.20.0",
-    "typedoc": "^0.15.0",
+    "typedoc": "^0.16.7",
     "typescript": "^3.6.3",
     "utf8": "^3.0.0",
+    "web3-02": "git+ssh://git@github.com:gulabs/web3-02.git",
     "webpack": "^4.40.2",
     "webpack-cli": "^3.3.9",
-    "xhr2-cookies": "^1.1.0",
-    "web3-02": "git+ssh://git@github.com:gulabs/web3-02.git"
+    "xhr2-cookies": "^1.1.0"
   }
 }

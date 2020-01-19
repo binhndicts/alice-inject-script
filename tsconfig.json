@@ -10,11 +10,10 @@
       "es5",
       "esnext"
     ],
-    "declaration": false,
+    "declaration": true,
     "noImplicitAny": false,
     "sourceMap": true,
     "removeComments": true,
-    "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
     "noEmitHelpers": true,
@@ -23,7 +22,21 @@
     "strict": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "rootDir": "./",
+    "rootDir": "./src",
     "outDir": "./build"
-  }
+  },
+  "exclude": [
+    "build",
+    "dist",
+    "../node_modules",
+    "__tests__",
+    "./**/__tests__/*.ts",
+    "./**/__tests__/*.tsx",
+    "./**/__mocks__/*.ts",
+    "gulpfile.js",
+    "jest-setup.js",
+    "__mocks__",
+    "webpack.config.js",
+    "webpack.config.production.js"
+],
 }

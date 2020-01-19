@@ -1,23 +1,20 @@
 import { AliceProvider } from '../web3/alice-provider';
+
 declare let window;
 
 const Web3 = require('web3-02');
 
-export class Web3BridgeForReactNative {
-
+export class Web3BridgeForChrome {
+  
   private _callbacks: object = {};
   private _provider = new AliceProvider();
 
   init = () => {
     this._provider.subscribeSendAsync((data, callback) => {
-      const payload = data.payload;
-
       data['timestamp'] = Date.now();
 
       this._callbacks[data.timestamp] = callback;
       window.ReactNativeWebView.postMessage(JSON.stringify(data));
-
-      data.doOrigin = false;
     });
 
     window.ethereum = this._provider;
