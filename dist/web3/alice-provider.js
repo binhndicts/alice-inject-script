@@ -1,10 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const tslib_1 = require("tslib");
-const EventEmitter = require('events').EventEmitter;
+const mitt_1 = tslib_1.__importDefault(require("mitt"));
+exports.EVENT_SENDSYNC = 'onSendAsync';
 class AliceProvider {
     constructor() {
-        this._emitter = new EventEmitter();
+        this._emitter = mitt_1.default();
+    }
+    get emmiter() {
+        return this.emmiter;
     }
     send(payload, callback) {
         this.sendAsync(payload, callback);
@@ -13,12 +17,12 @@ class AliceProvider {
         let data = {
             payload: payload,
         };
-        this._emitter.emit('onSendAsync', data, (result) => {
+        this._emitter.emit(exports.EVENT_SENDSYNC, data, (result) => {
             callback(null, result);
         });
     }
-    subscribeSendAsync(func) {
-        this._emitter.on('onSendAsync', func);
+    subscribeEthMessage(func) {
+        this._emitter.on(exports.EVENT_SENDSYNC, func);
     }
     enable() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -42,7 +46,7 @@ class AliceProvider {
                     payload: payload,
                     doOrigin: false
                 };
-                this._emitter.emit('onSendAsync', data, (result) => {
+                this._emitter.emit(exports.EVENT_SENDSYNC, data, (result) => {
                     if (result != undefined) {
                         const accounts = result.result;
                         resolve(accounts);

@@ -1,11 +1,18 @@
-const EventEmitter = require('events').EventEmitter;
+import mitt from 'mitt'
+// let EventEmitter: mitt.Emitter = new mitt();
+
+export const EVENT_SENDSYNC = 'onSendAsync';
 
 export class AliceProvider {
 
   private _emitter;
 
   constructor() {
-    this._emitter = new EventEmitter();
+    this._emitter = mitt();
+  }
+
+  get emmiter() {
+    return this.emmiter;
   }
 
   /**
@@ -28,19 +35,19 @@ export class AliceProvider {
     let data = {
       payload: payload,
     };
-    this._emitter.emit('onSendAsync', data, (result) => {
+    this._emitter.emit(EVENT_SENDSYNC, data, (result) => {
       callback(null, result);
     });
   }
 
-  /**
-   * Should be used to subscrive async request
-   *
-   * @method subscribeSendAsync
-   * @param {Function} subscrive function
-   */
-  public subscribeSendAsync(func: (data, callback) => void ) {
-    this._emitter.on('onSendAsync', func);
+  // /**
+  //  * Should be used to subscrive async request
+  //  *
+  //  * @method subscribeEthMessage
+  //  * @param {Function} subscrive function
+  //  */
+  public subscribeEthMessage(func: (data, callback) => void ) {
+    this._emitter.on(EVENT_SENDSYNC, func);
   }
 
   //
@@ -69,7 +76,7 @@ export class AliceProvider {
         payload: payload,
         doOrigin : false
       };
-      this._emitter.emit('onSendAsync', data, (result) => {
+      this._emitter.emit(EVENT_SENDSYNC, data, (result) => {
         if ( result != undefined ) {
           const accounts = result.result;
           resolve(accounts);

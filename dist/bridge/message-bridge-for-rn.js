@@ -7,12 +7,10 @@ class Web3BridgeForReactNative {
         this._callbacks = {};
         this._provider = new alice_provider_1.AliceProvider();
         this.init = () => {
-            this._provider.subscribeSendAsync((data, callback) => {
-                const payload = data.payload;
+            this._provider.subscribeEthMessage((data, callback) => {
                 data['timestamp'] = Date.now();
                 this._callbacks[data.timestamp] = callback;
                 window.ReactNativeWebView.postMessage(JSON.stringify(data));
-                data.doOrigin = false;
             });
             window.ethereum = this._provider;
             window.web3 = new Web3(this._provider);
