@@ -9,26 +9,26 @@ export class Web3BridgeForReactNative {
   private _provider = new AliceProvider();
 
   init = () => {
-    this._provider.subscribeEthMessage((data, callback) => {
-      data['timestamp'] = Date.now();
-      this._callbacks[data.timestamp] = callback;
-      window.ReactNativeWebView.postMessage(JSON.stringify(data));
-    });
+    // this._provider.subscribeEthMessage((data, callback) => {
+    //   data['timestamp'] = Date.now();
+    //   this._callbacks[data.timestamp] = callback;
+    //   window.ReactNativeWebView.postMessage(JSON.stringify(data));
+    // });
 
-    window.ethereum = this._provider;
-    window.web3 = new Web3(this._provider);
+    // window.ethereum = this._provider;
+    // window.web3 = new Web3(this._provider);
 
-    window.alice = {
-      callback: (response) => {
-        const result = JSON.parse(response);
+    // window.alice = {
+    //   callback: (response) => {
+    //     const result = JSON.parse(response);
 
-        if (this._callbacks[result.timestamp]) {
-          this._callbacks[result.timestamp](result.data);
-        }
+    //     if (this._callbacks[result.timestamp]) {
+    //       this._callbacks[result.timestamp](result.data);
+    //     }
 
-        delete this._callbacks[result.timestamp];
-      }
-    };
+    //     delete this._callbacks[result.timestamp];
+    //   }
+    // };
 
     console.log('ALICE: web3 injected.');
   }

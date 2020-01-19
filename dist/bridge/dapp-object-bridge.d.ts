@@ -1,8 +1,8 @@
 export declare class DAppObjectBridge {
-    private _emitter;
-    private _callbacks;
+    private _registry;
+    private register;
     private _provider;
     static EVENT_ONETHMESSAGE: string;
-    injectObject: (targetObject: any) => void;
-    get emmiter(): any;
+    init: (targetObject: any) => void;
+    onEthMessage: (func: (data: any) => Promise<any>) => void;
 }

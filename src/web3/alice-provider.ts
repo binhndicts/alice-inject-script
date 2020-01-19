@@ -1,18 +1,13 @@
-import mitt from 'mitt'
-// let EventEmitter: mitt.Emitter = new mitt();
-
 export const EVENT_SENDSYNC = 'onSendAsync';
 
 export class AliceProvider {
 
-  private _emitter;
-
-  constructor() {
-    this._emitter = mitt();
+  private _registry = new Map<string, (request) => Promise<any>>();
+  private register(id: string, func: (request) => Promise<any>) {
+    this._registry.set(id, func)
   }
 
-  get emmiter() {
-    return this.emmiter;
+  constructor() {
   }
 
   /**
@@ -35,9 +30,14 @@ export class AliceProvider {
     let data = {
       payload: payload,
     };
-    this._emitter.emit(EVENT_SENDSYNC, data, (result) => {
-      callback(null, result);
-    });
+    if ( this._registry.has(EVENT_SENDSYNC) ) {
+      const func = this._registry.get(EVENT_SENDSYNC);
+      if ( func ) {
+        func(data).then( result => {
+          callback(null, result);
+        });
+      }
+    };
   }
 
   // /**
@@ -46,8 +46,8 @@ export class AliceProvider {
   //  * @method subscribeEthMessage
   //  * @param {Function} subscrive function
   //  */
-  public subscribeEthMessage(func: (data, callback) => void ) {
-    this._emitter.on(EVENT_SENDSYNC, func);
+  public onEthMessage(func: (data) => Promise<any> ) {
+    this.register(EVENT_SENDSYNC, func);
   }
 
   //
@@ -76,13 +76,13 @@ export class AliceProvider {
         payload: payload,
         doOrigin : false
       };
-      this._emitter.emit(EVENT_SENDSYNC, data, (result) => {
-        if ( result != undefined ) {
-          const accounts = result.result;
-          resolve(accounts);
-        }
-        reject('getAcco0unts failed');
-      });
+      // this._emitter.emit(EVENT_SENDSYNC, data, (result) => {
+      //   if ( result != undefined ) {
+      //     const accounts = result.result;
+      //     resolve(accounts);
+      //   }
+      //   reject('getAcco0unts failed');
+      // });
     });
   }
 }
