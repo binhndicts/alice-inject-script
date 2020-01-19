@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const alice_provider_1 = require("../web3/alice-provider");
 const Web3 = require('web3-02');
+const EVENT_ONETHMESSAGE = 'ON_ETH_MESSAGE';
 class DAppObjectBridge {
     constructor() {
         this._registry = new Map();
@@ -11,18 +12,25 @@ class DAppObjectBridge {
             targetObject.web3 = new Web3(this._provider);
             this._provider.onEthMessage((event) => {
                 return new Promise((resolve, reject) => {
-                    if (this._registry.has(DAppObjectBridge.EVENT_ONETHMESSAGE)) {
-                        const func = this._registry[DAppObjectBridge.EVENT_ONETHMESSAGE];
-                        func(event).then(result => {
-                            resolve(result);
-                        });
+                    if (this._registry.has(EVENT_ONETHMESSAGE)) {
+                        const func = this._registry.get(EVENT_ONETHMESSAGE);
+                        if (func) {
+                            func(event).then(result => {
+                                resolve(result);
+                            });
+                        }
+                        else {
+                            reject('DOB: func is not registered');
+                        }
                     }
-                    reject('Handler Not Registered');
+                    else {
+                        reject('DOB: Handler is not registered');
+                    }
                 });
             });
         };
         this.onEthMessage = (func) => {
-            this.register(DAppObjectBridge.EVENT_ONETHMESSAGE, func);
+            this.register(EVENT_ONETHMESSAGE, func);
         };
     }
     register(id, func) {
@@ -30,5 +38,4 @@ class DAppObjectBridge {
     }
 }
 exports.DAppObjectBridge = DAppObjectBridge;
-DAppObjectBridge.EVENT_ONETHMESSAGE = 'ON_ETH_MESSAGE';
 //# sourceMappingURL=dapp-object-bridge.js.map

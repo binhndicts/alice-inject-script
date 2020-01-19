@@ -28,10 +28,10 @@ export class DAppObjectBridge {
               resolve(result);
             });
           } else {
-            reject('func is not registered');
+            reject('DOB: func is not registered');
           }
         } else {
-          reject('Handler is not registered');
+          reject('DOB: Handler is not registered');
         }
       });
       // return new Promise<void>( ( resolve, reject ) => {

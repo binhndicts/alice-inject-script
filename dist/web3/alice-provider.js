@@ -19,7 +19,9 @@ class AliceProvider {
         if (this._registry.has(exports.EVENT_SENDSYNC)) {
             const func = this._registry.get(exports.EVENT_SENDSYNC);
             if (func) {
-                func(data).then(result => callback(null, result));
+                func(data).then(result => {
+                    callback(null, result);
+                });
             }
         }
         ;
