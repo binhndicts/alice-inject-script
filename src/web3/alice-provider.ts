@@ -1,23 +1,77 @@
-export const EVENT_SENDSYNC = 'onSendAsync';
+/*
+    This file is part of web3.js.
 
-export class AliceProvider {
+    web3.js is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  private _registry = new Map<string, (request) => Promise<any>>();
-  private register(id: string, func: (request) => Promise<any>) {
-    this._registry.set(id, func)
-  }
+    web3.js is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
 
-  constructor() {
+    You should have received a copy of the GNU Lesser General Public License
+    along with web3.js.  If not, see <http://www.gnu.org/licenses/>.
+*/
+/** @file httpprovider.js
+ * @authors:
+ *   Marek Kotewicz <marek@ethdev.com>
+ *   Marian Oancea <marian@ethdev.com>
+ *   Fabian Vogelsteller <fabian@ethdev.com>
+ * @date 2015
+ */
+
+const HttpProvider = require('web3-02/lib/web3/httpprovider');
+
+import { EventEmitter } from "events"
+
+export class AliceProvider extends HttpProvider {
+
+  private _emitter  = new EventEmitter();
+
+  constructor(host?: string) {
+    super(host);
   }
 
   /**
+   * Override HttpProvider "send" function.
+   * Should be called to make sync request
+   *
    * @method send
    * @param {Object} payload
-   * @param {Function} callback triggered on end with (err, result)
+   * @return {Object} result
    */
-  public send(payload, callback) {
-    this.sendAsync(payload, callback);
-  }
+  public send(payload) {
+    console.log('AliceProvider : send payload:' + JSON.stringify(payload));
+    let data = {
+      payload: payload,
+      doOrigin : false
+    };
+    this._emitter.emit('onSend', data, (result) => {
+      return;
+    });
+    if ( data.doOrigin ) {
+      console.log('AliceProvider : send payload by Original:' + JSON.stringify(payload));
+      var request = this.prepareRequest(false);
+
+      try {
+        request.send(JSON.stringify(payload));
+      } catch (error) {
+        // throw errors.InvalidConnection(this.host);
+      }
+
+      var result = request.responseText;
+
+      try {
+        result = JSON.parse(result);
+      } catch (e) {
+        // throw errors.InvalidResponse(request.responseText);
+      }
+
+      return result;
+    }
+  };
 
   /**
    * Should be used to make async request
@@ -27,63 +81,39 @@ export class AliceProvider {
    * @param {Function} callback triggered on end with (err, result)
    */
   public sendAsync(payload, callback) {
+    console.log('SendAsync payload:' + JSON.stringify(payload));
     let data = {
       payload: payload,
+      doOrigin : false
     };
-    if ( this._registry.has(EVENT_SENDSYNC) ) {
-      const func = this._registry.get(EVENT_SENDSYNC);
-      if ( func ) {
-        func(data).then( result => {
-          callback(null, result);
-        });
-      }
-    };
-  }
+    this._emitter.emit('onSendAsync', data, (result) => {
+      callback(null, result);
+    });
 
-  // /**
-  //  * Should be used to subscrive async request
-  //  *
-  //  * @method subscribeEthMessage
-  //  * @param {Function} subscrive function
-  //  */
-  public onEthMessage(func: (data) => Promise<any> ) {
-    this.register(EVENT_SENDSYNC, func);
-  }
-
-  //
-  // The section is for ethereum object
-  //
+    if ( data.doOrigin ) {
+      console.log('sendAsyncOriginal : ' + JSON.stringify(payload));
+      super.sendAsync(payload, callback);
+    }
+  };
 
   /**
-   * Enalbe dapp account
+   * Should be used to subscrive async request
+   *
+   * @method subscribeSendAsync
+   * @param {Function} subscrive function
    */
-  public async enable() {
-    try {
-      const accounts = await this.getAccounts();
-      return accounts;
-    } catch ( err ) {
-      console.log(err);
-      return [];
-    }
+  onSend = (targetFunction : (data, callback) => void ) => {
+    this._emitter.on("onSend", targetFunction);
   }
 
-  private async getAccounts() {
-    return new Promise<string[]>( (resolve, reject) => {
-      const payload = {
-        method: 'eth_accounts'
-      };
-      let data = {
-        payload: payload,
-        doOrigin : false
-      };
-      // this._emitter.emit(EVENT_SENDSYNC, data, (result) => {
-      //   if ( result != undefined ) {
-      //     const accounts = result.result;
-      //     resolve(accounts);
-      //   }
-      //   reject('getAcco0unts failed');
-      // });
-    });
+  /**
+   * Should be used to subscrive async request
+   *
+   * @method subscribeSendAsync
+   * @param {Function} subscrive function
+   */
+  onSendAsync = (targetFunction : (data, callback) => void ) => {
+    this._emitter.on("onSendAsync", targetFunction);
   }
 }
 

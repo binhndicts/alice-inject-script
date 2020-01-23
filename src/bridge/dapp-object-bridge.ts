@@ -1,52 +1,128 @@
-import { AliceProvider, EVENT_SENDSYNC } from '../web3/alice-provider';
-
-declare let window;
-
-const Web3 = require('web3-02');
-
-const EVENT_ONETHMESSAGE = 'ON_ETH_MESSAGE';
+import Web3 from 'web3-02';
+import { AliceProvider } from '../web3/alice-provider';
+import { EventEmitter } from "events"
 
 export class DAppObjectBridge {
 
-  private _registry = new Map<string, (request) => Promise<any>>();
-  private register(id: string, func: (request) => Promise<any>) {
-    this._registry.set(id, func)
-  }
-  private _provider = new AliceProvider();
+  private _web3;
+  private _provider;
+  private _emitter  = new EventEmitter();
 
-  init = (targetObject) => {
+  constructor(
+    public _host?: string,
+    public defaultAccount: string = ''
+  ) {
+    // this binding
+    this.injectObject = this.injectObject.bind(this);
+    this.setDefaultAccount = this.setDefaultAccount.bind(this);
+    this.onSend = this.onSend.bind(this);
+    this.onSendAsync = this.onSendAsync.bind(this);
+
+  }
+
+  public injectObject(targetObject) {
+    this._provider = new AliceProvider(this._host);
+    this._web3 = new Web3(this._provider);
+    targetObject.web3 = this.web3;
     targetObject.ethereum = this._provider;
-    targetObject.web3 = new Web3(this._provider);
-    
 
-    this._provider.onEthMessage( (event) => {  
-      return new Promise( (resolve, reject) => {
-        if ( this._registry.has(EVENT_ONETHMESSAGE) ) {
-          const func = this._registry.get(EVENT_ONETHMESSAGE);
-          if ( func ) {
-            func(event).then( result => {
-              resolve(result);
-            });
-          } else {
-            reject('DOB: func is not registered');
-          }
-        } else {
-          reject('DOB: Handler is not registered');
-        }
-      });
-      // return new Promise<void>( ( resolve, reject ) => {
-      //   if ( this._registry.has(DAppObjectBridge.EVENT_ONETHMESSAGE) ) {
-      //     const func = this._registry[DAppObjectBridge.EVENT_ONETHMESSAGE];
-      //     func(event).then( result => {
-      //       resolve(result);
-      //     });
-      //   }
-      //   reject('Handler Not Registered');
-      // });
-    });
+    if ( this.defaultAccount != '') {
+      this._web3.eth.defaultAccount = this.defaultAccount;
+    }
+    this._provider.onSendAsync(this.onSendAsync);
+    console.log('Web3 injected');
   }
 
-  onEthMessage = (func: (data) => Promise<any> ) => {
-    this.register(EVENT_ONETHMESSAGE, func);
+  public get web3() {
+    return this._web3;
+  }
+
+  public setDefaultAccount(address) {
+    this._web3.eth.defaultAccount = address;
+  }
+
+  public onSend(data, callback) {
+    let result: any;
+    const payload = data.payload;
+    switch ( payload.method ) {
+      case 'eth_accounts':
+        result = this.defaultAccount ? [this.defaultAccount] : []
+        // need to stop execution after eventemitter
+        break;
+      case 'eth_coinbase':
+        result = this.defaultAccount ? [this.defaultAccount] : []
+        // need to stop execution after eventemitter
+        break;
+      // case 'eth_uninstallFilter':
+      //   this.sendAyncTransaction(payload, () => {});
+      //   result = true
+      //   break
+      // case 'net_version':
+      //   const networkVersion =
+      //   result = networkVersion || null
+      //   break
+      default:
+        // The payload is not target method which we should handle, so executre original httpprovider code
+        data.doOrigin = true;    
+        return;   
+    }
+
+    // return the result
+    return {
+      id: payload.id,
+      jsonrpc: payload.jsonrpc,
+      result: result,
+    }
+  }
+
+  public onSendAsync(data, callback) {
+    const payload = data.payload;
+    switch ( payload.method ) {
+      case 'eth_sendTransaction':
+        this._emitter.emit('onSendTransaction', data, (result) => {
+          callback(result);
+        });
+        break;
+      case 'personal_sign':
+        this._emitter.emit('onPersonalSign', data, (result) => {
+          callback(result);
+        });
+        break;
+      case 'net_version':
+        this._emitter.emit('onNetVersion', data, (result) => {
+          callback(result);
+        });
+        break;
+      case 'eth_accounts':
+        const result = this.defaultAccount ? [this.defaultAccount] : []
+        // need to stop execution after eventemitter
+        callback({
+          id: payload.id,
+          jsonrpc: payload.jsonrpc,
+          result: result,
+        });
+        break;
+      default:
+        // The payload is not target method which we should handle, so executre original httpprovider code
+        data.doOrigin = true;       
+    }
+  }
+
+  /**
+   * Should be used to subscrive async request
+   *
+   * @method onSendAsync
+   * @param {Function} subscrive function
+   */
+  onSendTransaction = (func : (data, callback) => void ) => {
+    this._emitter.on("onSendTransaction", func);
+  }
+
+  onPersonalSign = (func : (data, callback) => void ) => {
+    this._emitter.on("onPersonalSign", func);
+  }
+
+  onNetVersion = (func : (data, callback) => void ) => {
+    this._emitter.on("onNetVersion", func);
   }
 }

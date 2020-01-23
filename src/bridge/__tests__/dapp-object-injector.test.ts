@@ -1,25 +1,23 @@
 import { DAppObjectBridge } from '../dapp-object-bridge';
 
-describe('Web3BridgeForChrome tset', () => {
+describe('DAppObjectBridge tset', () => {
 
   test('Injected web3 test', (done) => {
     let window: any = {};
     const bridge = new DAppObjectBridge();
-    // injector.hello();
-    bridge.init(window);
+    bridge.injectObject(window);
     expect(window.web3).not.toBeNull();
 
-    console.log(window.web3.version);
-
-    bridge.onEthMessage( e => {
-      return new Promise( (resolve, reject) => {
-        console.log('onEthMessageCallback : ', e);
-        console.log('params : ', JSON.stringify(e));
-        expect(e.payload.params[0].from).toEqual('0xde0B295669a9FD93d5F28D9Ec85E40f4cb697BAe');
-        expect(e.payload.params[0].data).toEqual('hoge');      
-        resolve('hoge');
+    bridge.onSendTransaction( (data, callback) => {
+      expect(data.payload.params[0].from).toEqual('0xde0B295669a9FD93d5F28D9Ec85E40f4cb697BAe');
+      expect(data.payload.params[0].data).toEqual('hoge');     
+      data.doOrigin = false;
+      callback({
+        "id":1,
+        "jsonrpc":"2.0",
+        "result":"0xb5c10ddb7...f6a6c332cd7fe06397ef59eb23a6f788cde"
       });
-    })
+    });
 
     const web3: any = window.web3;
 
@@ -27,6 +25,8 @@ describe('Web3BridgeForChrome tset', () => {
       from: '0xde0B295669a9FD93d5F28D9Ec85E40f4cb697BAe',
       data: 'hoge' // deploying a contracrt
     }, function(error, hash){
+      expect(error).toBeNull();
+      expect(hash).toBe('0xb5c10ddb7...f6a6c332cd7fe06397ef59eb23a6f788cde');
       done();
     });
   })
