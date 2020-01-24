@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 const LocalMessageDuplexStream = require('post-message-stream')
 
-export default class EthereumUtils {
+export class EthereumUtils {
 
     constructor(
       public host: string,

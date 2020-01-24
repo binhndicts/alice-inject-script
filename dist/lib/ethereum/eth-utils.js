@@ -44,5 +44,5 @@ class EthereumUtils {
         });
     }
 }
-exports.default = EthereumUtils;
+exports.EthereumUtils = EthereumUtils;
 //# sourceMappingURL=eth-utils.js.map

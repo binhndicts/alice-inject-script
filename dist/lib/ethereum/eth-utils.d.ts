@@ -1,4 +1,4 @@
-export default class EthereumUtils {
+export declare class EthereumUtils {
     host: string;
     web3: any;
     constructor(host: string, web3?: any);
