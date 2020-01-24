@@ -6,18 +6,22 @@ export class GUDAppUtility {
 
   constructor(  
   ) {
-    // this._web3 = new Web3(_network.endpoint);
-
     this.sendTransaction = this.sendTransaction.bind(this);
     this.personalSign = this.personalSign.bind(this);
   }
 
-  public async sendTransaction(payload, networkId, networkUrl, privateKey, dialog: (rawTx) => Promise<boolean>) {
+  public async sendTransaction(
+    payload, 
+    chainId: number, 
+    networkUrl: string, 
+    privateKey: string, 
+    dialog: (rawTx) => Promise<boolean>) 
+  {
     const oldTx = payload.params[0];
     const web3 = new Web3(networkUrl);
     if ( oldTx.gas == undefined) {
       const gas = await TransactionUtils.estimateGas(networkUrl, {
-        chainId: networkId,
+        chainId: chainId,
         from: oldTx.from,
         to: oldTx.to,
         gasPrice: oldTx.gasPrice,
@@ -58,9 +62,9 @@ export class GUDAppUtility {
     }
   }
 
-  public async personalSign(payload, networkUrl, privateKey, dialog: (rawTx) => Promise<boolean>) {
+  public async personalSign(payload, privateKey: string, dialog: (rawTx) => Promise<boolean>) {
     const dataToSign = payload.params[0];
-    const address = payload.params[1];
+    // const address = payload.params[1];
     const message = Web3Utils.hexToUtf8(dataToSign);
 
     try {

@@ -9,13 +9,13 @@ class GUDAppUtility {
         this.sendTransaction = this.sendTransaction.bind(this);
         this.personalSign = this.personalSign.bind(this);
     }
-    sendTransaction(payload, networkId, networkUrl, privateKey, dialog) {
+    sendTransaction(payload, chainId, networkUrl, privateKey, dialog) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const oldTx = payload.params[0];
             const web3 = new web3_1.default(networkUrl);
             if (oldTx.gas == undefined) {
                 const gas = yield TransactionUtils.estimateGas(networkUrl, {
-                    chainId: networkId,
+                    chainId: chainId,
                     from: oldTx.from,
                     to: oldTx.to,
                     gasPrice: oldTx.gasPrice,
@@ -56,10 +56,9 @@ class GUDAppUtility {
             }
         });
     }
-    personalSign(payload, networkUrl, privateKey, dialog) {
+    personalSign(payload, privateKey, dialog) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const dataToSign = payload.params[0];
-            const address = payload.params[1];
             const message = Web3Utils.hexToUtf8(dataToSign);
             try {
                 if ((yield dialog(message)) == true) {
