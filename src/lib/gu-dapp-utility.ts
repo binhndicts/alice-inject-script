@@ -4,10 +4,7 @@ import Web3 from 'web3';
 
 export class GUDAppUtility {
 
-  constructor(
-    private _onShowPeersonalSignDialog: (rawTx) => Promise<boolean>,
-    private _onshowConfirmDialog: (rawTx) => Promise<boolean>
-  
+  constructor(  
   ) {
     // this._web3 = new Web3(_network.endpoint);
 
@@ -15,7 +12,7 @@ export class GUDAppUtility {
     this.personalSign = this.personalSign.bind(this);
   }
 
-  protected async sendTransaction(payload, networkId, networkUrl, privateKey) {
+  public async sendTransaction(payload, networkId, networkUrl, privateKey, dialog: (rawTx) => Promise<boolean>) {
     const oldTx = payload.params[0];
     const web3 = new Web3(networkUrl);
     if ( oldTx.gas == undefined) {
@@ -46,7 +43,7 @@ export class GUDAppUtility {
     }
 
     try {
-      if ( await this._onshowConfirmDialog(rawTx) == true ) {
+      if ( await dialog(rawTx) == true ) {
         let result = await TransactionUtils.sendSignedTransaction(networkUrl, privateKey, rawTx);
         return {
           "jsonrpc":"2.0",
@@ -61,13 +58,13 @@ export class GUDAppUtility {
     }
   }
 
-  protected async personalSign(payload, networkUrl, privateKey) {
+  public async personalSign(payload, networkUrl, privateKey, dialog: (rawTx) => Promise<boolean>) {
     const dataToSign = payload.params[0];
     const address = payload.params[1];
     const message = Web3Utils.hexToUtf8(dataToSign);
 
     try {
-      if ( await this._onShowPeersonalSignDialog(message) == true ) {
+      if ( await dialog(message) == true ) {
         let result =  await TransactionUtils.signPersonal(dataToSign, privateKey);
         return {
           "jsonrpc":"2.0",
@@ -80,13 +77,5 @@ export class GUDAppUtility {
     } catch ( err ) {
       throw new Error(err.message)
     }
-  }
-
-  public onShowPeersonalSignDialog( func : (rawTx) => Promise<boolean> ) {
-    this._onShowPeersonalSignDialog = func;
-  }
-
-  public onshowConfirmDialog( func : (rawTx) => Promise<boolean> ) {
-    this._onshowConfirmDialog = func;
   }
 }
