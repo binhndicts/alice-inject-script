@@ -5,13 +5,11 @@ const TransactionUtils = tslib_1.__importStar(require("./transaction/transaction
 const Web3Utils = tslib_1.__importStar(require("web3-utils"));
 const web3_1 = tslib_1.__importDefault(require("web3"));
 class GUDAppUtility {
-    constructor(_onShowPeersonalSignDialog, _onshowConfirmDialog) {
-        this._onShowPeersonalSignDialog = _onShowPeersonalSignDialog;
-        this._onshowConfirmDialog = _onshowConfirmDialog;
+    constructor() {
         this.sendTransaction = this.sendTransaction.bind(this);
         this.personalSign = this.personalSign.bind(this);
     }
-    sendTransaction(payload, networkId, networkUrl, privateKey) {
+    sendTransaction(payload, networkId, networkUrl, privateKey, dialog) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const oldTx = payload.params[0];
             const web3 = new web3_1.default(networkUrl);
@@ -41,7 +39,7 @@ class GUDAppUtility {
                 data: oldTx.data
             };
             try {
-                if ((yield this._onshowConfirmDialog(rawTx)) == true) {
+                if ((yield dialog(rawTx)) == true) {
                     let result = yield TransactionUtils.sendSignedTransaction(networkUrl, privateKey, rawTx);
                     return {
                         "jsonrpc": "2.0",
@@ -58,13 +56,13 @@ class GUDAppUtility {
             }
         });
     }
-    personalSign(payload, networkUrl, privateKey) {
+    personalSign(payload, networkUrl, privateKey, dialog) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const dataToSign = payload.params[0];
             const address = payload.params[1];
             const message = Web3Utils.hexToUtf8(dataToSign);
             try {
-                if ((yield this._onShowPeersonalSignDialog(message)) == true) {
+                if ((yield dialog(message)) == true) {
                     let result = yield TransactionUtils.signPersonal(dataToSign, privateKey);
                     return {
                         "jsonrpc": "2.0",
@@ -80,12 +78,6 @@ class GUDAppUtility {
                 throw new Error(err.message);
             }
         });
-    }
-    onShowPeersonalSignDialog(func) {
-        this._onShowPeersonalSignDialog = func;
-    }
-    onshowConfirmDialog(func) {
-        this._onshowConfirmDialog = func;
     }
 }
 exports.GUDAppUtility = GUDAppUtility;
