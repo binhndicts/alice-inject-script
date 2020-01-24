@@ -1,11 +1,10 @@
-export declare const EVENT_SENDSYNC = "onSendAsync";
-export declare class AliceProvider {
-    private _registry;
-    private register;
-    constructor();
-    send(payload: any, callback: any): void;
+declare const HttpProvider: any;
+export declare class AliceProvider extends HttpProvider {
+    private _emitter;
+    constructor(host?: string);
+    send(payload: any): any;
     sendAsync(payload: any, callback: any): void;
-    onEthMessage(func: (data: any) => Promise<any>): void;
-    enable(): Promise<string[]>;
-    private getAccounts;
+    onSend: (targetFunction: (data: any, callback: any) => void) => void;
+    onSendAsync: (targetFunction: (data: any, callback: any) => void) => void;
 }
+export {};
