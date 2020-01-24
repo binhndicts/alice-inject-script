@@ -1,6 +1,6 @@
 {
   "name": "alice-inject-script",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "main": "dist/index.js",
   "scripts": {
     "build": "npx tsc",
