@@ -120,6 +120,38 @@ export class AliceProvider extends HttpProvider {
   onSendAsync = (targetFunction : (data, callback) => void ) => {
     this._emitter.on("onSendAsync", targetFunction);
   }
+
+  //
+  // Implimentation for window.ethereum
+  //  
+  public async enable() {
+    try {
+      const accounts = await this.getAccounts();
+      return accounts;
+    } catch ( err ) {
+      console.log(err);
+      return [];
+    }
+  }
+
+  private async getAccounts() {
+    return new Promise<string[]>( (resolve, reject) => {
+      const payload = {
+        method: 'eth_accounts'
+      };
+      let data = {
+        payload: payload,
+        doOrigin : false
+      };
+      this._emitter.emit('onSendAsync', data, (result) => {
+        if ( result != undefined ) {
+          const accounts = result.result;
+          resolve(accounts);
+        }
+        reject('getAccounts failed');
+      });
+    });
+  }
 }
 
 // export default AliceProvider;
