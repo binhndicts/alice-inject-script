@@ -41,9 +41,10 @@ export class DAppObjectBridge {
     this._web3.eth.defaultAccount = address;
   }
 
-  public onSend(data, callback) {
+  public onSend(data) {
     let result: any;
     const payload = data.payload;
+    console.log('DAppObjectBridge : onSend:' + JSON.stringify(data));
     switch ( payload.method ) {
       case 'eth_accounts':
         result = this.defaultAccount ? [this.defaultAccount] : []

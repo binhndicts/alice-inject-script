@@ -13,13 +13,17 @@ class AliceProvider extends HttpProvider {
             this._emitter.on("onSendAsync", targetFunction);
         };
     }
-    send(payload) {
+    send(payload, callback) {
+        if (callback != undefined) {
+            return this.sendAsync(payload, callback);
+        }
         console.log('AliceProvider : send payload:' + JSON.stringify(payload));
         let data = {
             payload: payload,
             doOrigin: false
         };
         this._emitter.emit('onSend', data, (result) => {
+            console.log('AliceProvider : onSend:' + JSON.stringify(payload));
             return;
         });
         if (data.doOrigin) {
@@ -46,7 +50,9 @@ class AliceProvider extends HttpProvider {
             payload: payload,
             doOrigin: false
         };
+        console.log('onSendAsync : ' + JSON.stringify(payload));
         this._emitter.emit('onSendAsync', data, (result) => {
+            console.log('onSendAsync callback : ' + JSON.stringify(result));
             callback(null, result);
         });
         if (data.doOrigin) {

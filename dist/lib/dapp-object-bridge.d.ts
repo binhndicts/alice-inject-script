@@ -8,7 +8,7 @@ export declare class DAppObjectBridge {
     injectObject(targetObject: any): void;
     get web3(): any;
     setDefaultAccount(address: any): void;
-    onSend(data: any, callback: any): {
+    onSend(data: any): {
         id: any;
         jsonrpc: any;
         result: any;
