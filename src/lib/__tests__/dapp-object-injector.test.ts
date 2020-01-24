@@ -2,7 +2,7 @@ import { DAppObjectBridge } from '../dapp-object-bridge';
 
 describe('DAppObjectBridge tset', () => {
 
-  test('Injected web3 test', (done) => {
+test('Injected web3 test', (done) => {
     let window: any = {};
     const bridge = new DAppObjectBridge();
     bridge.injectObject(window);
@@ -30,5 +30,4 @@ describe('DAppObjectBridge tset', () => {
       done();
     });
   })
-
 });

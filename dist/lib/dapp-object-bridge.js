@@ -63,6 +63,7 @@ class DAppObjectBridge {
     }
     onSendAsync(data, callback) {
         const payload = data.payload;
+        console.log('onSendAsync : ' + JSON.stringify(payload));
         switch (payload.method) {
             case 'eth_sendTransaction':
                 this._emitter.emit('onSendTransaction', data, (result) => {

@@ -90,7 +90,6 @@ export class AliceProvider extends HttpProvider {
       payload: payload,
       doOrigin : false
     };
-    console.log('onSendAsync : ' + JSON.stringify(payload));
     this._emitter.emit('onSendAsync', data, (result) => {
       console.log('onSendAsync callback : ' + JSON.stringify(result));
       callback(null, result);
