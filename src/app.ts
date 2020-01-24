@@ -1,4 +1,4 @@
-import { Web3BridgeForReactNative } from './bridge/message-bridge-for-rn';
+import { Web3BridgeForReactNative } from './lib/message-bridge-for-rn';
 
 declare let window;
 

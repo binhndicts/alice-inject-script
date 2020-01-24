@@ -66,17 +66,18 @@ class DAppObjectBridge {
         console.log('onSendAsync : ' + JSON.stringify(payload));
         switch (payload.method) {
             case 'eth_sendTransaction':
-                this._emitter.emit('onSendTransaction', data, (result) => {
+                this._emitter.emit('onSendTransaction', payload, (result) => {
                     callback(result);
                 });
                 break;
             case 'personal_sign':
-                this._emitter.emit('onPersonalSign', data, (result) => {
+                this._emitter.emit('onPersonalSign', payload, (result) => {
                     callback(result);
                 });
                 break;
             case 'net_version':
-                this._emitter.emit('onNetVersion', data, (result) => {
+                console.log('onSendAsync : net_version' + JSON.stringify(data));
+                this._emitter.emit('onNetVersion', payload, (result) => {
                     callback(result);
                 });
                 break;
