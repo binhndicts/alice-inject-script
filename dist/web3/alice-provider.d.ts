@@ -6,5 +6,7 @@ export declare class AliceProvider extends HttpProvider {
     sendAsync(payload: any, callback: any): void;
     onSend: (targetFunction: (data: any, callback: any) => void) => void;
     onSendAsync: (targetFunction: (data: any, callback: any) => void) => void;
+    enable(): Promise<string[]>;
+    private getAccounts;
 }
 export {};

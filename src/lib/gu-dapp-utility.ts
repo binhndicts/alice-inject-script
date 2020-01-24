@@ -55,7 +55,11 @@ export class GUDAppUtility {
           "result": result
         };
       } else {
-        throw new Error("Signing request canceled.")
+        return {
+          "jsonrpc":"2.0",
+          "id": payload.id,
+          "result": "Signing request canceled."
+        };
       }
     } catch ( err ) {
       throw new Error(err.message)
@@ -76,7 +80,11 @@ export class GUDAppUtility {
           "result": result
         };
       } else {
-        throw new Error("Sign-in request canceled.")
+        return {
+          "jsonrpc":"2.0",
+          "id": payload.id,
+          "result": "Signing request canceled."
+        };
       }
     } catch ( err ) {
       throw new Error(err.message)

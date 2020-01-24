@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const tslib_1 = require("tslib");
 const HttpProvider = require('web3-02/lib/web3/httpprovider');
 const events_1 = require("events");
 class AliceProvider extends HttpProvider {
@@ -60,6 +61,38 @@ class AliceProvider extends HttpProvider {
         }
     }
     ;
+    enable() {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            try {
+                const accounts = yield this.getAccounts();
+                return accounts;
+            }
+            catch (err) {
+                console.log(err);
+                return [];
+            }
+        });
+    }
+    getAccounts() {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            return new Promise((resolve, reject) => {
+                const payload = {
+                    method: 'eth_accounts'
+                };
+                let data = {
+                    payload: payload,
+                    doOrigin: false
+                };
+                this._emitter.emit('onSendAsync', data, (result) => {
+                    if (result != undefined) {
+                        const accounts = result.result;
+                        resolve(accounts);
+                    }
+                    reject('getAccounts failed');
+                });
+            });
+        });
+    }
 }
 exports.AliceProvider = AliceProvider;
 //# sourceMappingURL=alice-provider.js.map
