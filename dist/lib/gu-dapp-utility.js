@@ -48,11 +48,7 @@ class GUDAppUtility {
                     };
                 }
                 else {
-                    return {
-                        "jsonrpc": "2.0",
-                        "id": payload.id,
-                        "result": "Signing request canceled."
-                    };
+                    return "Signing request canceled.";
                 }
             }
             catch (err) {
@@ -74,11 +70,7 @@ class GUDAppUtility {
                     };
                 }
                 else {
-                    return {
-                        "jsonrpc": "2.0",
-                        "id": payload.id,
-                        "result": "Signing request canceled."
-                    };
+                    return "Signing request canceled.";
                 }
             }
             catch (err) {

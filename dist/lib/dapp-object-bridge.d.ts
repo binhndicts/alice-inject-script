@@ -17,4 +17,5 @@ export declare class DAppObjectBridge {
     onSendTransaction: (func: (data: any, callback: any) => void) => void;
     onPersonalSign: (func: (data: any, callback: any) => void) => void;
     onNetVersion: (func: (data: any, callback: any) => void) => void;
+    onEthMessage: (func: (data: any, callback: any) => void) => void;
 }

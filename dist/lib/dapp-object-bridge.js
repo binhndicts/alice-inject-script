@@ -18,6 +18,9 @@ class DAppObjectBridge {
         this.onNetVersion = (func) => {
             this._emitter.on("onNetVersion", func);
         };
+        this.onEthMessage = (func) => {
+            this._emitter.on("onEthMessage", func);
+        };
         this.injectObject = this.injectObject.bind(this);
         this.setDefaultAccount = this.setDefaultAccount.bind(this);
         this.onSend = this.onSend.bind(this);
@@ -64,6 +67,9 @@ class DAppObjectBridge {
     onSendAsync(data, callback) {
         const payload = data.payload;
         console.log('onSendAsync : ' + JSON.stringify(payload));
+        this._emitter.emit('onEthMessage', payload, (result) => {
+            callback(result);
+        });
         switch (payload.method) {
             case 'eth_sendTransaction':
                 this._emitter.emit('onSendTransaction', payload, (result) => {
