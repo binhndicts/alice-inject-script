@@ -79,6 +79,11 @@ export class DAppObjectBridge {
   public onSendAsync(data, callback) {
     const payload = data.payload;
     console.log('onSendAsync : ' + JSON.stringify(payload));
+    this._emitter.emit('onEthMessage', payload, (result) => {
+      callback(result);
+    });
+
+    // for backward compatibility
     switch ( payload.method ) {
       case 'eth_sendTransaction':
         this._emitter.emit('onSendTransaction', payload, (result) => {
@@ -127,5 +132,9 @@ export class DAppObjectBridge {
 
   onNetVersion = (func : (data, callback) => void ) => {
     this._emitter.on("onNetVersion", func);
+  }
+
+  onEthMessage = (func : (data, callback) => void ) => {
+    this._emitter.on("onEthMessage", func);
   }
 }
