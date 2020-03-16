@@ -6,7 +6,8 @@
     "build": "npx tsc",
     "build:production": "npx webpack --config webpack.config.production.js",
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "prepare": "npm run build"
   },
   "jest": {
     "transform": {

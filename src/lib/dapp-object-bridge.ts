@@ -8,6 +8,8 @@ export class DAppObjectBridge {
   private _provider;
   private _emitter  = new EventEmitter();
 
+  private eventMethodMap: {[ethMethod: string]: string} = {};
+
   constructor(
     public _host?: string,
     public defaultAccount: string = ''
@@ -80,22 +82,22 @@ export class DAppObjectBridge {
     const payload = data.payload;
     console.log('onSendAsync : ' + JSON.stringify(payload));
     switch ( payload.method ) {
-      case 'eth_sendTransaction':
-        this._emitter.emit('onSendTransaction', payload, (result) => {
-          callback(result);
-        });
-        break;
-      case 'personal_sign':
-        this._emitter.emit('onPersonalSign', payload, (result) => {
-          callback(result);
-        });
-        break;
-      case 'net_version':
-        console.log('onSendAsync : net_version' + JSON.stringify(data));
-        this._emitter.emit('onNetVersion', payload, (result) => {
-          callback(result);
-        });
-        break;
+      // case 'eth_sendTransaction':
+      //   this._emitter.emit('onSendTransaction', payload, (result) => {
+      //     callback(result);
+      //   });
+      //   break;
+      // case 'personal_sign':
+      //   this._emitter.emit('onPersonalSign', payload, (result) => {
+      //     callback(result);
+      //   });
+      //   break;
+      // case 'net_version':
+      //   console.log('onSendAsync : net_version' + JSON.stringify(data));
+      //   this._emitter.emit('onNetVersion', payload, (result) => {
+      //     callback(result);
+      //   });
+      //   break;
       case 'eth_accounts':
         const result = this.defaultAccount ? [this.defaultAccount] : []
         // need to stop execution after eventemitter
@@ -106,8 +108,14 @@ export class DAppObjectBridge {
         });
         break;
       default:
-        // The payload is not target method which we should handle, so executre original httpprovider code
-        data.doOrigin = true;       
+        if (this.eventMethodMap[payload.method]) {
+          this._emitter.emit(this.eventMethodMap[payload.method], payload, (result) => {
+            callback(result);
+          });
+        } else {
+          // The payload is not target method which we should handle, so executre original httpprovider code
+          data.doOrigin = true;
+        }
     }
   }
 
@@ -118,14 +126,23 @@ export class DAppObjectBridge {
    * @param {Function} subscrive function
    */
   onSendTransaction = (func : (data, callback) => void ) => {
-    this._emitter.on("onSendTransaction", func);
+    this.registerEthHander('eth_sendTransaction', 'onSendTransaction', func);
   }
 
   onPersonalSign = (func : (data, callback) => void ) => {
-    this._emitter.on("onPersonalSign", func);
+    this.registerEthHander('personal_sign', 'onPersonalSign', func);
   }
 
   onNetVersion = (func : (data, callback) => void ) => {
-    this._emitter.on("onNetVersion", func);
+    this.registerEthHander('net_version', 'onNetVersion', func);
+  }
+
+  onGetTransactionByHash = (func : (data, callback) => void ) => {
+    this.registerEthHander('eth_getTransactionByHash', 'onGetTransactionByHash', func);
+  }
+
+  private registerEthHander = (methodName: string, eventName: string, func: (data, callback) => void) => {
+    this.eventMethodMap[methodName] = eventName;
+    this._emitter.on(eventName, func);
   }
 }
