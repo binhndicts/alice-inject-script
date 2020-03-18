@@ -19,5 +19,6 @@ export declare class DAppObjectBridge {
     onPersonalSign: (func: (data: any, callback: any) => void) => void;
     onNetVersion: (func: (data: any, callback: any) => void) => void;
     onGetTransactionByHash: (func: (data: any, callback: any) => void) => void;
+    onGetBalance: (func: (data: any, callback: any) => void) => void;
     private registerEthHander;
 }

@@ -141,6 +141,10 @@ export class DAppObjectBridge {
     this.registerEthHander('eth_getTransactionByHash', 'onGetTransactionByHash', func);
   }
 
+  onGetBalance = (func : (data, callback) => void ) => {
+    this.registerEthHander('eth_getBalance', 'onGetBalance', func);
+  }
+
   private registerEthHander = (methodName: string, eventName: string, func: (data, callback) => void) => {
     this.eventMethodMap[methodName] = eventName;
     this._emitter.on(eventName, func);
