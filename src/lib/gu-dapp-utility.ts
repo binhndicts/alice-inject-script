@@ -65,7 +65,12 @@ export class GUDAppUtility {
   public async personalSign(payload, privateKey: string, dialog: (rawTx) => Promise<boolean>) {
     const dataToSign = payload.params[0];
     // const address = payload.params[1];
-    const message = Web3Utils.hexToUtf8(dataToSign);
+    let message = dataToSign;
+    try {
+      message = Web3Utils.hexToUtf8(dataToSign);
+    } catch (err) {
+      console.log('Cannot convert hex message to utf8', dataToSign, err);
+    }
 
     try {
       if ( await dialog(message) == true ) {
