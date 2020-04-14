@@ -2,6 +2,7 @@ import Web3 from 'web3-02';
 import { AliceProvider } from '../web3/alice-provider';
 import { EventEmitter } from "events"
 
+const ALICE_DEFAULT_METHOD_HANDLER = 'ALICE_DEFAULT_METHOD_HANDLER';
 export class DAppObjectBridge {
 
   private _web3;
@@ -112,6 +113,10 @@ export class DAppObjectBridge {
           this._emitter.emit(this.eventMethodMap[payload.method], payload, (result) => {
             callback(result);
           });
+        } else if (this.eventMethodMap[ALICE_DEFAULT_METHOD_HANDLER]) {
+          this._emitter.emit(this.eventMethodMap[ALICE_DEFAULT_METHOD_HANDLER], payload, (result) => {
+            callback(result);
+          });
         } else {
           // The payload is not target method which we should handle, so executre original httpprovider code
           data.doOrigin = true;
@@ -143,6 +148,11 @@ export class DAppObjectBridge {
 
   onGetBalance = (func : (data, callback) => void ) => {
     this.registerEthHander('eth_getBalance', 'onGetBalance', func);
+  }
+
+  // For iOS only to handle unknown methods
+  onDoOrigin = (func : (data, callback) => void ) => {
+    this.registerEthHander(ALICE_DEFAULT_METHOD_HANDLER, 'onDoOrigin', func);
   }
 
   private registerEthHander = (methodName: string, eventName: string, func: (data, callback) => void) => {
