@@ -2,7 +2,7 @@ import Web3 from 'web3-02';
 import { AliceProvider } from '../web3/alice-provider';
 import { EventEmitter } from "events"
 
-const ALICE_DEFAULT_METHOD_HANDLER = 'ALICE_DEFAULT_METHOD_HANDLER';
+const ASYNC_HANDLER = 'ASYNC_HANDLER';
 export class DAppObjectBridge {
 
   private _web3;
@@ -19,7 +19,7 @@ export class DAppObjectBridge {
     this.injectObject = this.injectObject.bind(this);
     this.setDefaultAccount = this.setDefaultAccount.bind(this);
     this.onSend = this.onSend.bind(this);
-    this.onSendAsync = this.onSendAsync.bind(this);
+    this.handleSendAsync = this.handleSendAsync.bind(this);
 
   }
 
@@ -32,7 +32,7 @@ export class DAppObjectBridge {
     if ( this.defaultAccount != '') {
       this._web3.eth.defaultAccount = this.defaultAccount;
     }
-    this._provider.onSendAsync(this.onSendAsync);
+    this._provider.onSendAsync(this.handleSendAsync);
     console.log('Web3 injected');
   }
 
@@ -79,7 +79,7 @@ export class DAppObjectBridge {
     }
   }
 
-  public onSendAsync(data, callback) {
+  public handleSendAsync(data, callback) {
     const payload = data.payload;
     console.log('onSendAsync : ' + JSON.stringify(payload));
     switch ( payload.method ) {
@@ -113,8 +113,8 @@ export class DAppObjectBridge {
           this._emitter.emit(this.eventMethodMap[payload.method], payload, (result) => {
             callback(result);
           });
-        } else if (this.eventMethodMap[ALICE_DEFAULT_METHOD_HANDLER]) {
-          this._emitter.emit(this.eventMethodMap[ALICE_DEFAULT_METHOD_HANDLER], payload, (result) => {
+        } else if (this.eventMethodMap[ASYNC_HANDLER]) {
+          this._emitter.emit(this.eventMethodMap[ASYNC_HANDLER], payload, (result) => {
             callback(result);
           });
         } else {
@@ -151,8 +151,8 @@ export class DAppObjectBridge {
   }
 
   // For iOS only to handle unknown methods
-  onDoOrigin = (func : (data, callback) => void ) => {
-    this.registerEthHander(ALICE_DEFAULT_METHOD_HANDLER, 'onDoOrigin', func);
+  onSendAsync = (func : (data, callback) => void ) => {
+    this.registerEthHander(ASYNC_HANDLER, 'onSendAsync', func);
   }
 
   private registerEthHander = (methodName: string, eventName: string, func: (data, callback) => void) => {
