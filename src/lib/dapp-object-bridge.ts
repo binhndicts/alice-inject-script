@@ -2,11 +2,11 @@ import Web3 from 'web3-02';
 import { AliceProvider } from '../web3/alice-provider';
 import { EventEmitter } from "events"
 
-const ASYNC_HANDLER = 'ASYNC_HANDLER';
+const SEND_ASYNC_HANDLER = 'SEND_ASYNC_HANDLER';
 export class DAppObjectBridge {
 
   private _web3;
-  private _provider;
+  private _provider: AliceProvider | undefined = undefined;
   private _emitter  = new EventEmitter();
 
   private eventMethodMap: {[ethMethod: string]: string} = {};
@@ -79,48 +79,16 @@ export class DAppObjectBridge {
     }
   }
 
-  public handleSendAsync(data, callback) {
+  private handleSendAsync(data, callback) {
     const payload = data.payload;
     console.log('onSendAsync : ' + JSON.stringify(payload));
-    switch ( payload.method ) {
-      // case 'eth_sendTransaction':
-      //   this._emitter.emit('onSendTransaction', payload, (result) => {
-      //     callback(result);
-      //   });
-      //   break;
-      // case 'personal_sign':
-      //   this._emitter.emit('onPersonalSign', payload, (result) => {
-      //     callback(result);
-      //   });
-      //   break;
-      // case 'net_version':
-      //   console.log('onSendAsync : net_version' + JSON.stringify(data));
-      //   this._emitter.emit('onNetVersion', payload, (result) => {
-      //     callback(result);
-      //   });
-      //   break;
-      case 'eth_accounts':
-        const result = this.defaultAccount ? [this.defaultAccount] : []
-        // need to stop execution after eventemitter
-        callback({
-          id: payload.id,
-          jsonrpc: payload.jsonrpc,
-          result: result,
-        });
-        break;
-      default:
-        if (this.eventMethodMap[payload.method]) {
-          this._emitter.emit(this.eventMethodMap[payload.method], payload, (result) => {
-            callback(result);
-          });
-        } else if (this.eventMethodMap[ASYNC_HANDLER]) {
-          this._emitter.emit(this.eventMethodMap[ASYNC_HANDLER], payload, (result) => {
-            callback(result);
-          });
-        } else {
-          // The payload is not target method which we should handle, so executre original httpprovider code
-          data.doOrigin = true;
-        }
+    if (this.eventMethodMap[SEND_ASYNC_HANDLER]) {
+      this._emitter.emit(this.eventMethodMap[SEND_ASYNC_HANDLER], payload, (result) => {
+        callback(result);
+      });
+    } else {
+      // The payload is not target method which we should handle, so executre original httpprovider code
+      data.doOrigin = true;
     }
   }
 
@@ -130,29 +98,8 @@ export class DAppObjectBridge {
    * @method onSendAsync
    * @param {Function} subscrive function
    */
-  onSendTransaction = (func : (data, callback) => void ) => {
-    this.registerEthHander('eth_sendTransaction', 'onSendTransaction', func);
-  }
-
-  onPersonalSign = (func : (data, callback) => void ) => {
-    this.registerEthHander('personal_sign', 'onPersonalSign', func);
-  }
-
-  onNetVersion = (func : (data, callback) => void ) => {
-    this.registerEthHander('net_version', 'onNetVersion', func);
-  }
-
-  onGetTransactionByHash = (func : (data, callback) => void ) => {
-    this.registerEthHander('eth_getTransactionByHash', 'onGetTransactionByHash', func);
-  }
-
-  onGetBalance = (func : (data, callback) => void ) => {
-    this.registerEthHander('eth_getBalance', 'onGetBalance', func);
-  }
-
-  // For iOS only to handle unknown methods
   onSendAsync = (func : (data, callback) => void ) => {
-    this.registerEthHander(ASYNC_HANDLER, 'onSendAsync', func);
+    this.registerEthHander(SEND_ASYNC_HANDLER, 'onSendAsync', func);
   }
 
   private registerEthHander = (methodName: string, eventName: string, func: (data, callback) => void) => {
